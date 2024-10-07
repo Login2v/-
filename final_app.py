@@ -37,11 +37,21 @@ def get_model_path(path: str) -> str:
         MODEL_PATH = path
     return MODEL_PATH
 
-def load_models():
-    model_path = get_model_path("/my/super/path")
-    model = CatBoostClassifier()
-    model.load_model(model_path)
-    return model
+def download_model(url: str, save_path: str):  
+    response = requests.get(url)  
+    with open(save_path, 'wb') as f:  
+        f.write(response.content)  
+
+def load_models(url: str):  
+      
+    local_model_path = '/tmp/model.cbm'    
+
+     
+    download_model(url, local_model_path)  
+
+    model = CatBoostClassifier()  
+    model.load_model(local_model_path)  
+    return model 
 
 def load_features() -> pd.DataFrame:
     query_user_df = 'SELECT * FROM mai_user_featurs_final'
@@ -64,7 +74,8 @@ logger.info("Start")
 
 #загружаем модель
 logger.info("load_models")
-model = load_models()
+model_url = 'https://disk.yandex.ru/d/FoXVV3APlS2rIw'  
+model = load_models(model_url)
 
 #загружаем таблицу с фичами для всех юзеров
 logger.info("load_user_features")
